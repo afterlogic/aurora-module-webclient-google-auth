@@ -2,7 +2,7 @@
 
 class GoogleAuthModule extends AApiModule
 {
-	public $oApiSocialManager = null;
+	protected $sService = 'google';
 	
 	protected $aSettingsMap = array(
 		'Id' => array('', 'string'),
@@ -16,7 +16,6 @@ class GoogleAuthModule extends AApiModule
 	public function init() 
 	{
 		$this->incClass('connector');
-		$this->oApiSocialManager = $this->GetManager('social');
 		$this->subscribeEvent('ExternalServicesAction', array($this, 'onExternalServicesAction'));
 		$this->subscribeEvent('GetServices', array($this, 'onGetServices'));
 	}
@@ -28,12 +27,12 @@ class GoogleAuthModule extends AApiModule
 	 */
 	public function onGetServices(&$aServices)
 	{
-		$aServices[] = 'google';
+		$aServices[] = $this->sService;
 	}
 	
 	public function onExternalServicesAction($sService, &$mResult)
 	{
-		if ($sService === 'google')
+		if ($sService === $this->sService)
 		{
 			$mResult = false;
 			$oConnector = new CExternalServicesConnectorGoogle($this);
