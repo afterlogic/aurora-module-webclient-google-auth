@@ -1,6 +1,6 @@
 <?php
 
-class CExternalServicesConnectorGoogle  extends CExternalServicesConnector
+class COAuthIntegratorConnectorGoogle  extends COAuthIntegratorConnector
 {
 	public static $ConnectorName = 'google';
 	
