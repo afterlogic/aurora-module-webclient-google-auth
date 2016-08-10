@@ -1,6 +1,6 @@
 <?php
 
-class GoogleAuthModule extends AApiModule
+class GoogleAuthWebclientModule extends AApiModule
 {
 	protected $sService = 'google';
 	
