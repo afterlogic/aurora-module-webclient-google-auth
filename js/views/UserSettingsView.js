@@ -41,8 +41,8 @@ CUserSettingsView.prototype.ViewTemplate = '%ModuleName%_UserSettingsView';
 
 CUserSettingsView.prototype.connect = function ()
 {
-	$.cookie('external-services-redirect', 'connect');
-	WindowOpener.open(UrlUtils.getAppPath() + '?external-services=google', 'Google');
+	$.cookie('oauth-redirect', 'connect');
+	WindowOpener.open(UrlUtils.getAppPath() + '?oauth=google', 'Google');
 };
 
 CUserSettingsView.prototype.disconnect = function ()
