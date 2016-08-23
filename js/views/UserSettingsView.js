@@ -25,7 +25,7 @@ function CUserSettingsView()
 	this.connected = ko.observable(Settings.Connected);
 	this.bRunCallback = false;
 	
-	window.googleConnectCallback = _.bind(function (bResult, sMessage) {
+	window.googleConnectCallback = _.bind(function (bResult, sMessage, sModule) {
 		
 		this.bRunCallback = true;
 		if (!bResult) 
@@ -48,11 +48,12 @@ CUserSettingsView.prototype.connect = function ()
 	$.cookie('oauth-redirect', 'connect');
 	var 
 		self = this,
-		oWin = WindowOpener.open(UrlUtils.getAppPath() + '?oauth=facebook', 'Facebook'),
+		oWin = WindowOpener.open(UrlUtils.getAppPath() + '?oauth=google', 'Google'),
 		intervalID = setInterval(
 			function() { 
 				if (oWin.closed)
 				{
+					clearInterval(intervalID);
 					if (!self.bRunCallback)
 					{
 						window.location.reload();
