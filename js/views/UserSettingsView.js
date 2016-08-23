@@ -23,7 +23,7 @@ function CUserSettingsView()
 	CAbstractSettingsFormView.call(this, Settings.ServerModuleName);
 	
 	this.connected = ko.observable(Settings.Connected);
-	window.googleSettingsViewModelCallback = _.bind(function (bResult, sMessage) {
+	window.googleConnectCallback = _.bind(function (bResult, sMessage) {
 		if (!bResult) 
 		{
 			Screens.showError(sMessage);
