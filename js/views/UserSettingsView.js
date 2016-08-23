@@ -23,7 +23,11 @@ function CUserSettingsView()
 	CAbstractSettingsFormView.call(this, Settings.ServerModuleName);
 	
 	this.connected = ko.observable(Settings.Connected);
+	this.bRunCallback = false;
+	
 	window.googleConnectCallback = _.bind(function (bResult, sMessage) {
+		
+		this.bRunCallback = true;
 		if (!bResult) 
 		{
 			Screens.showError(sMessage);
@@ -42,7 +46,25 @@ CUserSettingsView.prototype.ViewTemplate = '%ModuleName%_UserSettingsView';
 CUserSettingsView.prototype.connect = function ()
 {
 	$.cookie('oauth-redirect', 'connect');
-	WindowOpener.open(UrlUtils.getAppPath() + '?oauth=google', 'Google');
+	var 
+		self = this,
+		oWin = WindowOpener.open(UrlUtils.getAppPath() + '?oauth=facebook', 'Facebook'),
+		intervalID = setInterval(
+			function() { 
+				if (oWin.closed)
+				{
+					if (!self.bRunCallback)
+					{
+						window.location.reload();
+					}
+					else
+					{
+						clearInterval(intervalID);
+					}
+				}
+			}, 1000
+		)
+	;
 };
 
 CUserSettingsView.prototype.disconnect = function ()
