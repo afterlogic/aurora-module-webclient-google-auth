@@ -22,7 +22,7 @@ class COAuthIntegratorConnectorGoogle  extends COAuthIntegratorConnector
 		$oClient->client_id = $this->oModule->GetConfig('Id');
 		$oClient->client_secret = $this->oModule->GetConfig('Secret');
 
-		$oClient->scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
+		$oClient->scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile  https://www.googleapis.com/auth/drive';
 		if (in_array('filestorage', self::$Scopes))
 		{
 			$oClient->scope = $oClient->scope . ' https://www.googleapis.com/auth/drive';
