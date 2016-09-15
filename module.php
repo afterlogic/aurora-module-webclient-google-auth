@@ -24,9 +24,31 @@ class GoogleAuthWebclientModule extends AApiModule
 		$this->subscribeEvent('UpdateServicesSettings', array($this, 'onUpdateServicesSettings'));
 	}
 	
+	/***** private functions *****/
 	/**
-	 * Adds dropbox service name to array passed by reference.
+	 * Passes data to connect to service.
 	 * 
+	 * @ignore
+	 * @param string $sService Service type to verify if data should be passed.
+	 * @param boolean|array $mResult variable passed by reference to take the result.
+	 */
+	public function onOAuthIntegratorAction($sService, &$mResult)
+	{
+		if ($sService === $this->sService)
+		{
+			$mResult = false;
+			$oConnector = new COAuthIntegratorConnectorGoogle($this);
+			if ($oConnector)
+			{
+				$mResult = $oConnector->Init();
+			}
+		}
+	}
+	
+	/**
+	 * Adds service name to array passed by reference.
+	 * 
+	 * @ignore
 	 * @param array $aServices Array with services names passed by reference.
 	 */
 	public function onGetServices(&$aServices)
@@ -40,6 +62,7 @@ class GoogleAuthWebclientModule extends AApiModule
 	/**
 	 * Adds service settings to array passed by reference.
 	 * 
+	 * @ignore
 	 * @param array $aServices Array with services settings passed by reference.
 	 */
 	public function onGetServicesSettings(&$aServices)
@@ -52,7 +75,27 @@ class GoogleAuthWebclientModule extends AApiModule
 	}
 	
 	/**
-	 * Returns module settings.
+	 * Updates service settings.
+	 * 
+	 * @ignore
+	 * @param array $aServices Array with new values for service settings.
+	 * 
+	 * @throws \System\Exceptions\AuroraApiException
+	 */
+	public function onUpdateServicesSettings($aServices)
+	{
+		$aSettings = $aServices[$this->sService];
+		
+		if (is_array($aSettings))
+		{
+			$this->UpdateSettings($aSettings['EnableModule'], $aSettings['Id'], $aSettings['Secret']);
+		}
+	}
+	/***** private functions *****/
+	
+	/***** public functions might be called with web API *****/
+	/**
+	 * Obtaines list of module settings for authenticated user.
 	 * 
 	 * @return array
 	 */
@@ -91,26 +134,9 @@ class GoogleAuthWebclientModule extends AApiModule
 	/**
 	 * Updates service settings.
 	 * 
-	 * @param array $aServices Array with new values for service settings.
-	 * 
-	 * @throws \System\Exceptions\AuroraApiException
-	 */
-	public function onUpdateServicesSettings($aServices)
-	{
-		$aSettings = $aServices[$this->sService];
-		
-		if (is_array($aSettings))
-		{
-			$this->UpdateSettings($aSettings['EnableModule'], $aSettings['Id'], $aSettings['Secret']);
-		}
-	}
-	
-	/**
-	 * Updates service settings.
-	 * 
-	 * @param boolean $EnableModule
-	 * @param string $Id
-	 * @param string $Secret
+	 * @param boolean $EnableModule **true** if module should be enabled.
+	 * @param string $Id Service app identificator.
+	 * @param string $Secret Service app secret.
 	 * 
 	 * @throws \System\Exceptions\AuroraApiException
 	 */
@@ -133,19 +159,11 @@ class GoogleAuthWebclientModule extends AApiModule
 		return true;
 	}
 	
-	public function onOAuthIntegratorAction($sService, &$mResult)
-	{
-		if ($sService === $this->sService)
-		{
-			$mResult = false;
-			$oConnector = new COAuthIntegratorConnectorGoogle($this);
-			if ($oConnector)
-			{
-				$mResult = $oConnector->Init();
-			}
-		}
-	}
-	
+	/**
+	 * Deletes DropBox account.
+	 * 
+	 * @return boolean
+	 */
 	public function DeleteAccount()
 	{
 		\CApi::checkUserRoleIsAtLeast(\EUserRole::NormalUser);
@@ -159,4 +177,5 @@ class GoogleAuthWebclientModule extends AApiModule
 		
 		return $bResult;
 	}	
+	/***** public functions might be called with web API *****/
 }
