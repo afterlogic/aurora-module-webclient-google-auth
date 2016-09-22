@@ -26,6 +26,12 @@
 						<input class="input" type="text" data-bind="value: secret, valueUpdate: 'afterkeydown', onEnter: save" />
 					</span>
 				</div>
+				<div class="row">
+					<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_APP_KEY'}"></span>
+					<span class="value">
+						<input class="input" type="text" data-bind="value: key, valueUpdate: 'afterkeydown', onEnter: save" />
+					</span>
+				</div>
 				<div class="row"></div><div class="row"></div>
 				<div class="hint row">
 					<span class="value" data-bind="i18n: {'key': '%MODULENAME%/INFO_SETTINGS'}"></span>

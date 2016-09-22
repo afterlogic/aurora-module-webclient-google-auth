@@ -13,6 +13,7 @@ module.exports = {
 	EnableModule: false,
 	Id: '',
 	Secret: '',
+	Key: '',
 	
 	/**
 	 * Initializes settings from AppData object section of this module.
@@ -28,6 +29,7 @@ module.exports = {
 			this.EnableModule = !!oAppDataSection.EnableModule;
 			this.Id = Types.pString(oAppDataSection.Id);
 			this.Secret = Types.pString(oAppDataSection.Secret);
+			this.Key = Types.pString(oAppDataSection.Key);
 		}
 	},
 	
@@ -37,11 +39,13 @@ module.exports = {
 	 * @param {boolean} bEnableModule
 	 * @param {string} sId
 	 * @param {string} sSecret
+	 * @param {string} sKey
 	 */
-	updateAdmin: function (bEnableModule, sId, sSecret)
+	updateAdmin: function (bEnableModule, sId, sSecret, sKey)
 	{
 		this.EnableModule = bEnableModule;
 		this.Id = sId;
 		this.Secret = sSecret;
+		this.Key = sKey;
 	}
 };

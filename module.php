@@ -132,7 +132,8 @@ class GoogleAuthWebclientModule extends AApiModule
 				'DisplayName' => $this->GetName(),
 				'EnableModule' => $this->getConfig('EnableModule', false),
 				'Id' => $this->getConfig('Id', ''),
-				'Secret' => $this->getConfig('Secret', '')
+				'Secret' => $this->getConfig('Secret', ''),
+				'Key' => $this->getConfig('Key', '')
 			);
 		}
 		
@@ -159,10 +160,11 @@ class GoogleAuthWebclientModule extends AApiModule
 	 * @param boolean $EnableModule **true** if module should be enabled.
 	 * @param string $Id Service app identificator.
 	 * @param string $Secret Service app secret.
+	 * @param string $Key Service app key.
 	 * 
 	 * @throws \System\Exceptions\AuroraApiException
 	 */
-	public function UpdateSettings($EnableModule, $Id, $Secret)
+	public function UpdateSettings($EnableModule, $Id, $Secret, $Key)
 	{
 		\CApi::checkUserRoleIsAtLeast(\EUserRole::TenantAdmin);
 		
@@ -171,6 +173,7 @@ class GoogleAuthWebclientModule extends AApiModule
 			$this->setConfig('EnableModule', $EnableModule);
 			$this->setConfig('Id', $Id);
 			$this->setConfig('Secret', $Secret);
+			$this->setConfig('Key', $Key);
 			$this->saveModuleConfig();
 		}
 		catch (Exception $ex)
