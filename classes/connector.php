@@ -1,5 +1,9 @@
 <?php
-
+/**
+ *
+ * @package Classes
+ * @subpackage AuthIntegrator
+ */
 class COAuthIntegratorConnectorGoogle  extends COAuthIntegratorConnector
 {
 	public static $ConnectorName = 'google';
