@@ -11,11 +11,11 @@
 							<span class="icon"></span>
 							<input type="checkbox" id="enableGoogle" data-bind="checked: enable" />
 						</label>
-						<label for="enableGoogle" data-bind="text: '%ModuleName%'"></label>
+						<label for="enableGoogle" data-bind="i18n: {'key': '%MODULENAME%/ENABLE_MODULE'}"></label>
 					</span>
 				</div>
 				<div class="row">
-					<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_APP_ID'}"></span>
+					<span class="label" data-bind="i18n: {'key': '%MODULENAME%/LABEL_API_ID'}"></span>
 					<span class="value">
 						<input class="input" type="text" data-bind="value: id, valueUpdate: 'afterkeydown', onEnter: save" />
 					</span>
