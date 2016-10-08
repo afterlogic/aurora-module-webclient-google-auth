@@ -10,6 +10,7 @@ var
 	
 	Ajax = require('%PathToCoreWebclientModule%/js/Ajax.js'),
 	Api = require('%PathToCoreWebclientModule%/js/Api.js'),
+	App = require('%PathToCoreWebclientModule%/js/App.js'),
 	ModulesManager = require('%PathToCoreWebclientModule%/js/ModulesManager.js'),
 	WindowOpener = require('%PathToCoreWebclientModule%/js/WindowOpener.js'),
 	
@@ -64,6 +65,7 @@ CUserSettingsView.prototype.connect = function ()
 				else
 				{
 					clearInterval(iIntervalId);
+					App.broadcastEvent('OAuthAccountChange::after');
 				}
 			}
 		}, this), 1000)
@@ -79,6 +81,7 @@ CUserSettingsView.prototype.disconnect = function ()
 		if (oResponse.Result)
 		{
 			this.connected(false);
+			App.broadcastEvent('OAuthAccountChange::after');
 		}
 		else
 		{
