@@ -90,7 +90,7 @@ class GoogleAuthWebclientModule extends AApiModule
 	 */
 	public function onGetServicesSettings(&$aServices)
 	{
-		$aSettings = $this->GetAppData();
+		$aSettings = $this->GetSettings();
 		if (!empty($aSettings))
 		{
 			$aServices[] = $aSettings;
@@ -122,7 +122,7 @@ class GoogleAuthWebclientModule extends AApiModule
 	 * 
 	 * @return array
 	 */
-	public function GetAppData()
+	public function GetSettings()
 	{
 		\CApi::checkUserRoleIsAtLeast(\EUserRole::Anonymous);
 		
