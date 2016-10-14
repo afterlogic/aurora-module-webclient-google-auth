@@ -74,7 +74,7 @@ class GoogleAuthWebclientModule extends AApiModule
 	 * @ignore
 	 * @param array $aServices Array with services names passed by reference.
 	 */
-	public function onGetServices(&$aServices)
+	public function onGetServices($aArgs, &$aServices)
 	{
 		if ($this->getConfig('EnableModule', false))
 		{
