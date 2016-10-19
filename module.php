@@ -26,12 +26,18 @@ class GoogleAuthWebclientModule extends AApiModule
 		'EnableModule' => array(false, 'bool'),
 		'Id' => array('', 'string'),
 		'Key' => array('', 'string'),
-		'Secret' => array('', 'string')
+		'Secret' => array('', 'string'),
+		'Scopes' => array('login', 'string')
 	);
 	
 	protected $aRequireModules = array(
 		'OAuthIntegratorWebclient'
 	);
+	
+	protected function issetScope($sScope)
+	{
+		return in_array($sScope, explode(' ', $this->getConfig('Scopes')));
+	}
 	
 	/***** private functions *****/
 	/**
@@ -78,8 +84,13 @@ class GoogleAuthWebclientModule extends AApiModule
 	{
 		if ($this->getConfig('EnableModule', false))
 		{
-			$aServices[] = $this->sService;
+			if ($this->issetScope('login'))
+			{
+				$aServices[] = $this->sService;
+			}
 		}
+		
+		return true;
 	}
 	
 	/**
