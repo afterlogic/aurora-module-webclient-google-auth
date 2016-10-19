@@ -27,7 +27,7 @@ class GoogleAuthWebclientModule extends AApiModule
 		'Id' => array('', 'string'),
 		'Key' => array('', 'string'),
 		'Secret' => array('', 'string'),
-		'Scopes' => array('login', 'string')
+		'Scopes' => array('auth', 'string')
 	);
 	
 	protected $aRequireModules = array(
@@ -84,7 +84,7 @@ class GoogleAuthWebclientModule extends AApiModule
 	{
 		if ($this->getConfig('EnableModule', false))
 		{
-			if ($this->issetScope('login'))
+			if ($this->issetScope('auth'))
 			{
 				$aServices[] = $this->sService;
 			}
