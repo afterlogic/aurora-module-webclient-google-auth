@@ -77,7 +77,7 @@ class COAuthIntegratorConnectorGoogle  extends COAuthIntegratorConnector
 			if($success && $oUser)
 			{
 				// if you need re-ask user for permission
-				$oClient->ResetAccessToken();
+//				$oClient->ResetAccessToken();
 				
 				$iExpiresIn = 3600;
 				$dAccessTokenExpiry = new DateTime($oClient->access_token_expiry);
