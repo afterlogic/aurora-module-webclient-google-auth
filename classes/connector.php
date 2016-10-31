@@ -13,7 +13,7 @@ class COAuthIntegratorConnectorGoogle  extends COAuthIntegratorConnector
 		return array('auth');
 	}
 
-	public function CreateClient()
+	public function CreateClient($sId, $sSecret)
 	{
 		$sRedirectUrl = rtrim(\MailSo\Base\Http::SingletonInstance()->GetFullUrl(), '\\/ ').'/?oauth='.self::$ConnectorName;
 
@@ -23,8 +23,8 @@ class COAuthIntegratorConnectorGoogle  extends COAuthIntegratorConnector
 		$oClient->debug_http = self::$Debug;
 		$oClient->server = 'Google';
 		$oClient->redirect_uri = $sRedirectUrl;
-		$oClient->client_id = $this->oModule->GetConfig('Id');
-		$oClient->client_secret = $this->oModule->GetConfig('Secret');
+		$oClient->client_id = $sId;
+		$oClient->client_secret = $sSecret;
 
 		$oClient->scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile  https://www.googleapis.com/auth/drive';
 		if (in_array('filestorage', self::$Scopes))
@@ -35,14 +35,12 @@ class COAuthIntegratorConnectorGoogle  extends COAuthIntegratorConnector
 		return $oClient;
 	}
 
-	public function Init()
+	public function Init($Id, $sSecret)
 	{
-		parent::Init();
-		
 		$bResult = false;
 		$oUser = null;
 
-		$oClient = self::CreateClient();
+		$oClient = self::CreateClient($Id, $sSecret);
 		if($oClient)
 		{
 			if(($success = $oClient->Initialize()))

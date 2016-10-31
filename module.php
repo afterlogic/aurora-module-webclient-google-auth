@@ -23,15 +23,11 @@ class GoogleAuthWebclientModule extends AApiModule
 	protected $sService = 'google';
 	
 	protected $aSettingsMap = array(
-		'EnableModule' => array(false, 'bool'),
-		'Id' => array('', 'string'),
-		'Key' => array('', 'string'),
-		'Secret' => array('', 'string'),
 		'Scopes' => array('auth', 'string')
 	);
 	
 	protected $aRequireModules = array(
-		'OAuthIntegratorWebclient'
+		'OAuthIntegratorWebclient', 'Google'
 	);
 	
 	protected function issetScope($sScope)
@@ -69,7 +65,10 @@ class GoogleAuthWebclientModule extends AApiModule
 			$oConnector = new COAuthIntegratorConnectorGoogle($this);
 			if ($oConnector)
 			{
-				$mResult = $oConnector->Init();
+				$mResult = $oConnector->Init(
+					\CApi::GetModule('Google')->getConfig('Id'), 
+					\CApi::GetModule('Google')->getConfig('Secret')
+				);
 			}
 		}
 	}
@@ -84,10 +83,10 @@ class GoogleAuthWebclientModule extends AApiModule
 	{
 		if ($this->getConfig('EnableModule', false))
 		{
-			if ($this->issetScope('auth'))
-			{
+//			if ($this->issetScope('auth'))
+//			{
 				$aServices[] = $this->sService;
-			}
+//			}
 		}
 		
 		return true;
@@ -152,12 +151,8 @@ class GoogleAuthWebclientModule extends AApiModule
 		
 		if (!empty($oUser) && $oUser->Role === \EUserRole::NormalUser)
 		{
-			$oAccount = null;
-			$oOAuthIntegratorWebclientDecorator = \CApi::GetModuleDecorator('OAuthIntegratorWebclient');
-			if ($oOAuthIntegratorWebclientDecorator)
-			{
-				$oAccount = $oOAuthIntegratorWebclientDecorator->GetAccount($this->sService);
-			}
+			$oAccount = \CApi::GetModuleDecorator('OAuthIntegratorWebclient')->GetAccount($this->sService);
+
 			return array(
 				'EnableModule' => $this->getConfig('EnableModule', false),
 				'Connected' => $oAccount ? true : false
