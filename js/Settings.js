@@ -5,7 +5,7 @@ var
 ;
 
 module.exports = {
-	ServerModuleName: 'GoogleAuthWebclient',
+	ServerModuleName: 'Google',
 	HashModuleName: 'google-auth',
 	
 	Connected: false,
