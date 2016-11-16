@@ -22,18 +22,10 @@ class GoogleAuthWebclientModule extends AApiModule
 {
 	protected $sService = 'google';
 	
-	protected $aSettingsMap = array(
-		'Scopes' => array('auth', 'string')
-	);
-	
 	protected $aRequireModules = array(
-		'OAuthIntegratorWebclient', 'Google'
+		'OAuthIntegratorWebclient', 
+		'Google'
 	);
-	
-	protected function issetScope($sScope)
-	{
-		return in_array($sScope, explode(' ', $this->getConfig('Scopes')));
-	}
 	
 	/***** private functions *****/
 	/**
@@ -44,8 +36,21 @@ class GoogleAuthWebclientModule extends AApiModule
 	public function init()
 	{
 		$this->incClass('connector');
+		$this->subscribeEvent('OAuthIntegratorWebclient::GetServices::after', array($this, 'onAfterGetServices'));
 		$this->subscribeEvent('OAuthIntegratorAction', array($this, 'onOAuthIntegratorAction'));
+		$this->subscribeEvent('Google::GetSettings', array($this, 'onGetSettings'));
 	}
+	
+	/**
+	 * Adds service name to array passed by reference.
+	 * 
+	 * @ignore
+	 * @param array $aServices Array with services names passed by reference.
+	 */
+	public function onAfterGetServices($aArgs, &$aServices)
+	{
+			$aServices[] = $this->sService;
+	}	
 	
 	/**
 	 * Passes data to connect to service.
@@ -56,6 +61,7 @@ class GoogleAuthWebclientModule extends AApiModule
 	 */
 	public function onOAuthIntegratorAction($aArgs, &$mResult)
 	{
+		$aScopes = $_COOKIE['oauth-scopes'];
 		if ($aArgs['Service'] === $this->sService)
 		{
 			$mResult = false;
@@ -64,9 +70,34 @@ class GoogleAuthWebclientModule extends AApiModule
 			{
 				$mResult = $oConnector->Init(
 					\CApi::GetModule('Google')->getConfig('Id'), 
-					\CApi::GetModule('Google')->getConfig('Secret')
+					\CApi::GetModule('Google')->getConfig('Secret'),
+					$aScopes
 				);
 			}
+			return true;
 		}
 	}
+	
+	/**
+	 * Passes data to connect to service.
+	 * 
+	 * @ignore
+	 * @param string $aArgs Service type to verify if data should be passed.
+	 * @param boolean|array $mResult variable passed by reference to take the result.
+	 */
+	public function onGetSettings($aArgs, &$mResult)
+	{
+		$iUserId = \CApi::getAuthenticatedUserId();
+		
+		$aScope = array(
+			'Name' => 'auth',
+			'Description' => $this->i18N('SCOPE_AUTH', $iUserId),
+			'Value' => false
+		);
+		if ($aArgs['OAuthAccount'] instanceof \COAuthAccount)
+		{
+			$aScope['Value'] = $aArgs['OAuthAccount']->issetScope('auth');
+		}
+		$mResult['Scopes'][] = $aScope;
+	}	
 }

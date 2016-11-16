@@ -6,16 +6,11 @@
  */
 class COAuthIntegratorConnectorGoogle  extends COAuthIntegratorConnector
 {
-	public static $ConnectorName = 'google';
-	
-	public function GetSupportedScopes()
-	{
-		return array('auth');
-	}
+	public $Name = 'google';
 
-	public function CreateClient($sId, $sSecret)
+	public function CreateClient($sId, $sSecret, $sScope = '')
 	{
-		$sRedirectUrl = rtrim(\MailSo\Base\Http::SingletonInstance()->GetFullUrl(), '\\/ ').'/?oauth='.self::$ConnectorName;
+		$sRedirectUrl = rtrim(\MailSo\Base\Http::SingletonInstance()->GetFullUrl(), '\\/ ').'/?oauth='.$this->Name;
 
 		$oClient = new \oauth_client_class;
 		$oClient->offline = true;
@@ -25,90 +20,74 @@ class COAuthIntegratorConnectorGoogle  extends COAuthIntegratorConnector
 		$oClient->redirect_uri = $sRedirectUrl;
 		$oClient->client_id = $sId;
 		$oClient->client_secret = $sSecret;
-
-		$oClient->scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile  https://www.googleapis.com/auth/drive';
-		if (in_array('filestorage', self::$Scopes))
-		{
-			$oClient->scope = $oClient->scope . ' https://www.googleapis.com/auth/drive';
-		}
-		
+		$oClient->scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive';
 		return $oClient;
 	}
 
-	public function Init($Id, $sSecret)
+	public function Init($Id, $sSecret, $sScope = '')
 	{
-		$bResult = false;
-		$oUser = null;
+		$mResult = false;
 
-		$oClient = self::CreateClient($Id, $sSecret);
+		$oClient = $this->CreateClient($Id, $sSecret, $sScope);
 		if($oClient)
 		{
-			if(($success = $oClient->Initialize()))
+			$oUser = null;
+			if(($bSuccess = $oClient->Initialize()))
 			{
-				if(($success = $oClient->Process()))
+				if(($bSuccess = $oClient->Process()))
 				{
 					if(strlen($oClient->access_token))
 					{
-						$success = $oClient->CallAPI(
+						$bSuccess = $oClient->CallAPI(
 							'https://www.googleapis.com/oauth2/v1/userinfo',
 							'GET',
 							array(),
-							array('FailOnAccessError'=>true),
+							array(
+								'FailOnAccessError' => true
+							),
 							$oUser
 						);
 					}
 					else
 					{
 						$oClient->error = $oClient->authorization_error;
-						$success = false;
+						$bSuccess = false;
 					}
 				}
-				$success = $oClient->Finalize($success);
+				$bSuccess = $oClient->Finalize($bSuccess);
 			}
 
 			if($oClient->exit)
 			{
-				$bResult = false;
 				exit;
 			}
 
-			if($success && $oUser)
+			if($bSuccess && $oUser)
 			{
-				// if you need re-ask user for permission
-//				$oClient->ResetAccessToken();
-				
 				$iExpiresIn = 3600;
 				$dAccessTokenExpiry = new DateTime($oClient->access_token_expiry);
-				$aAccessToken = json_encode(array(
-					'access_token' => $oClient->access_token,
-					'created' => ($dAccessTokenExpiry->getTimestamp() - $iExpiresIn),
-					'expires_in' => $iExpiresIn
-				));
-				
-				$aSocial = array(
-					'type' => self::$ConnectorName,
+				$mResult = array(
+					'type' => $this->Name,
 					'id' => $oUser->id,
 					'name' => $oUser->name,
 					'email' => isset($oUser->email) ? $oUser->email : '',
-					'access_token' => $aAccessToken,
+					'access_token' => json_encode(array(
+						'access_token' => $oClient->access_token,
+						'created' => ($dAccessTokenExpiry->getTimestamp() - $iExpiresIn),
+						'expires_in' => $iExpiresIn
+					)),
 					'refresh_token' => $oClient->refresh_token,
-					'scopes' => self::$Scopes
+					'scopes' => explode('|', $sScope)
 				);
-
-				\CApi::Log('social_user_'.self::$ConnectorName);
-				\CApi::LogObject($oUser);
-
-				$bResult = $aSocial;
 			}
 			else
 			{
-				$bResult = false;
+				$mResult = false;
 
 				$oClient->ResetAccessToken();
-				self::_socialError($oClient->error, self::$ConnectorName);
 			}
 		}
 		
-		return $bResult;
+		return $mResult;
 	}
 }
