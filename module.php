@@ -49,7 +49,10 @@ class GoogleAuthWebclientModule extends AApiModule
 	 */
 	public function onAfterGetServices($aArgs, &$aServices)
 	{
+		if ($this->getConfig('EnableModule', false))
+		{
 			$aServices[] = $this->sService;
+		}
 	}	
 	
 	/**
