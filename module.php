@@ -49,7 +49,10 @@ class GoogleAuthWebclientModule extends AApiModule
 	 */
 	public function onAfterGetServices($aArgs, &$aServices)
 	{
-		if ($this->getConfig('EnableModule', false))
+		$oGoogleModule = \CApi::GetModule('Google'); 
+		
+		if ($oGoogleModule->getConfig('EnableModule', false) &&
+			!empty($oGoogleModule->getConfig('Id', '')) && !empty($oGoogleModule->getConfig('Secret', '')))
 		{
 			$aServices[] = $this->sService;
 		}
@@ -64,7 +67,7 @@ class GoogleAuthWebclientModule extends AApiModule
 	 */
 	public function onOAuthIntegratorAction($aArgs, &$mResult)
 	{
-		$aScopes = $_COOKIE['oauth-scopes'];
+		$sScopes = isset($_COOKIE['oauth-scopes']) ? $_COOKIE['oauth-scopes'] : '';
 		if ($aArgs['Service'] === $this->sService)
 		{
 			$mResult = false;
@@ -74,7 +77,7 @@ class GoogleAuthWebclientModule extends AApiModule
 				$mResult = $oConnector->Init(
 					\CApi::GetModule('Google')->getConfig('Id'), 
 					\CApi::GetModule('Google')->getConfig('Secret'),
-					$aScopes
+					$sScopes
 				);
 			}
 			return true;
