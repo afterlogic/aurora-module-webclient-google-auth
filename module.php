@@ -22,10 +22,6 @@ class GoogleAuthWebclientModule extends AApiModule
 {
 	protected $sService = 'google';
 	
-	protected $aSettingsMap = array(
-		'Scopes' => array('auth', 'string')
-	);
-	
 	protected $aRequireModules = array(
 		'OAuthIntegratorWebclient', 
 		'Google'
