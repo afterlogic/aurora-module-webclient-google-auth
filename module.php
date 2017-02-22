@@ -18,7 +18,9 @@
  * @package Modules
  */
 
-class GoogleAuthWebclientModule extends AApiModule
+namespace Aurora\Modules;
+
+class GoogleAuthWebclientModule extends \AApiModule
 {
 	protected $sService = 'google';
 	
@@ -29,7 +31,7 @@ class GoogleAuthWebclientModule extends AApiModule
 	
 	protected function issetScope($sScope)
 	{
-		return in_array($sScope, explode(' ', $this->getConfig('Scopes')));
+		return \in_array($sScope, \explode(' ', $this->getConfig('Scopes')));
 	}
 	
 	/***** private functions *****/
@@ -77,7 +79,7 @@ class GoogleAuthWebclientModule extends AApiModule
 		if ($aArgs['Service'] === $this->sService)
 		{
 			$mResult = false;
-			$oConnector = new COAuthIntegratorConnectorGoogle($this);
+			$oConnector = new \COAuthIntegratorConnectorGoogle($this);
 			if ($oConnector)
 			{
 				$mResult = $oConnector->Init(
