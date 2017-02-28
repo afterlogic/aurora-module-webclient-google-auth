@@ -20,7 +20,7 @@
 
 namespace Aurora\Modules;
 
-class GoogleAuthWebclientModule extends \AApiModule
+class GoogleAuthWebclientModule extends \Aurora\System\AbstractModule
 {
 	protected $sService = 'google';
 	
@@ -57,7 +57,7 @@ class GoogleAuthWebclientModule extends \AApiModule
 	 */
 	public function onAfterGetServices($aArgs, &$aServices)
 	{
-		$oModule = \CApi::GetModule('Google'); 
+		$oModule = \Aurora\System\Api::GetModule('Google'); 
 		
 		if ($oModule->getConfig('EnableModule', false)  && $this->issetScope('auth') &&
 			!empty($oModule->getConfig('Id', '')) && !empty($oModule->getConfig('Secret', '')))
@@ -83,8 +83,8 @@ class GoogleAuthWebclientModule extends \AApiModule
 			if ($oConnector)
 			{
 				$mResult = $oConnector->Init(
-					\CApi::GetModule('Google')->getConfig('Id'), 
-					\CApi::GetModule('Google')->getConfig('Secret'),
+					\Aurora\System\Api::GetModule('Google')->getConfig('Id'), 
+					\Aurora\System\Api::GetModule('Google')->getConfig('Secret'),
 					$sScopes
 				);
 			}
@@ -101,7 +101,7 @@ class GoogleAuthWebclientModule extends \AApiModule
 	 */
 	public function onGetSettings($aArgs, &$mResult)
 	{
-		$oUser = \CApi::getAuthenticatedUser();
+		$oUser = \Aurora\System\Api::getAuthenticatedUser();
 		
 		if (!empty($oUser))
 		{
