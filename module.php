@@ -20,7 +20,7 @@
 
 namespace Aurora\Modules;
 
-class GoogleAuthWebclientModule extends \Aurora\System\AbstractModule
+class GoogleAuthWebclientModule extends \Aurora\System\Module\AbstractModule
 {
 	protected $sService = 'google';
 	
