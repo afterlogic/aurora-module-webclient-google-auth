@@ -30,12 +30,12 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		'Google'
 	);
 	
+	/***** private functions *****/
 	protected function issetScope($sScope)
 	{
-		return \in_array($sScope, \explode(' ', $this->getConfig('Scopes')));
+		return in_array($sScope, explode(' ', $this->getConfig('Scopes')));
 	}
 	
-	/***** private functions *****/
 	/**
 	 * Initializes FacebookAuthWebclient Module.
 	 * 
@@ -54,13 +54,14 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	 * Adds service name to array passed by reference.
 	 * 
 	 * @ignore
+	 * @param array $aArgs
 	 * @param array $aServices Array with services names passed by reference.
 	 */
 	public function onAfterGetServices($aArgs, &$aServices)
 	{
 		$oModule = \Aurora\System\Api::GetModule('Google'); 
 		
-		if ($oModule->getConfig('EnableModule', false)  && $this->issetScope('auth') &&
+		if ($oModule->getConfig('EnableModule', false) && $this->issetScope('auth') &&
 			!empty($oModule->getConfig('Id', '')) && !empty($oModule->getConfig('Secret', '')))
 		{
 			$aServices[] = $this->sService;
@@ -76,9 +77,9 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	 */
 	public function onOAuthIntegratorAction($aArgs, &$mResult)
 	{
-		$sScopes = isset($_COOKIE['oauth-scopes']) ? $_COOKIE['oauth-scopes'] : '';
 		if ($aArgs['Service'] === $this->sService)
 		{
+			$sScopes = isset($_COOKIE['oauth-scopes']) ? $_COOKIE['oauth-scopes'] : '';
 			$mResult = false;
 			$oConnector = new \COAuthIntegratorConnectorGoogle($this);
 			if ($oConnector)
@@ -127,8 +128,8 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 					$mResult['Scopes'][] = $aScope;
 				}
 			}
-		}	
-	}	
+		}
+	}
 	
 	public function onAfterUpdateSettings($aArgs, &$mResult)
 	{
@@ -149,5 +150,5 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		}
 		$this->setConfig('Scopes', $sScope);
 		$this->saveModuleConfig();
-	}	
+	}
 }
