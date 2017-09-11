@@ -76,19 +76,19 @@ class Connector extends \Aurora\Modules\OAuthIntegratorWebclient\Classes\Connect
 			if($bSuccess && $oUser)
 			{
 				$iExpiresIn = 3600;
-				$dAccessTokenExpiry = new DateTime($oClient->access_token_expiry);
+				$dAccessTokenExpiry = new \DateTime($oClient->access_token_expiry);
 				$mResult = array(
 					'type' => $this->Name,
 					'id' => $oUser->id,
 					'name' => $oUser->name,
 					'email' => isset($oUser->email) ? $oUser->email : '',
-					'access_token' => json_encode(array(
+					'access_token' => \json_encode(array(
 						'access_token' => $oClient->access_token,
 						'created' => ($dAccessTokenExpiry->getTimestamp() - $iExpiresIn),
 						'expires_in' => $iExpiresIn
 					)),
 					'refresh_token' => $oClient->refresh_token,
-					'scopes' => explode('|', $sScope)
+					'scopes' => \explode('|', $sScope)
 				);
 			}
 			else
