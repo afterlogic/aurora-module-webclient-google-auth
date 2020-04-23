@@ -42,6 +42,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		$this->subscribeEvent('OAuthIntegratorAction', array($this, 'onOAuthIntegratorAction'));
 		$this->subscribeEvent('Google::GetSettings', array($this, 'onGetSettings'));
 		$this->subscribeEvent('Google::UpdateSettings::after', array($this, 'onAfterUpdateSettings'));
+		$this->subscribeEvent('RevokeAccessToken', array($this, 'onRevokeAccessToken'));
 	}
 	
 	/**
@@ -74,16 +75,26 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	{
 		if ($aArgs['Service'] === $this->sService)
 		{
-			$sScopes = isset($_COOKIE['oauth-scopes']) ? $_COOKIE['oauth-scopes'] : '';
+			$sOAuthScopes = isset($_COOKIE['oauth-scopes']) ? $_COOKIE['oauth-scopes'] : '';
+			$aGoogleScopes = [
+				'https://www.googleapis.com/auth/userinfo.email',
+				'https://www.googleapis.com/auth/userinfo.profile'
+			];
+			$this->broadcastEvent('PopulateScopes', $sOAuthScopes, $aGoogleScopes);
+
 			$mResult = false;
 			$oConnector = new Classes\Connector($this);
 			if ($oConnector)
 			{
-				$mResult = $oConnector->Init(
-					\Aurora\System\Api::GetModule('Google')->getConfig('Id'), 
-					\Aurora\System\Api::GetModule('Google')->getConfig('Secret'),
-					$sScopes
-				);
+				$oGoogleModule = \Aurora\System\Api::GetModule('Google');
+				if ($oGoogleModule)
+				{
+					$mResult = $oConnector->Init(
+						$oGoogleModule->getConfig('Id'),
+						$oGoogleModule->getConfig('Secret'),
+						[$sOAuthScopes, \implode($aGoogleScopes, ' ')]
+					);
+				}
 			}
 			return true;
 		}
@@ -145,5 +156,21 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		}
 		$this->setConfig('Scopes', $sScope);
 		$this->saveModuleConfig();
+	}
+
+	public function onRevokeAccessToken()
+	{
+		$oConnector = new Classes\Connector($this);
+		if ($oConnector)
+		{
+			$oGoogleModule = \Aurora\System\Api::GetModule('Google');
+			if ($oGoogleModule)
+			{
+				$mResult = $oConnector->RevokeAccessToken(
+					$oGoogleModule->getConfig('Id'),
+					$oGoogleModule->getConfig('Secret')
+				);
+			}
+		}
 	}
 }

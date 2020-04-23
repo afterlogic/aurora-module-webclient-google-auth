@@ -19,7 +19,7 @@ class Connector extends \Aurora\Modules\OAuthIntegratorWebclient\Classes\Connect
 {
 	public $Name = 'google';
 
-	public function CreateClient($sId, $sSecret, $sScope = '')
+	public function CreateClient($sId, $sSecret, $sScopes)
 	{
 		$sRedirectUrl = rtrim(\MailSo\Base\Http::SingletonInstance()->GetFullUrl(), '\\/ ').'/?oauth='.$this->Name;
 
@@ -31,15 +31,15 @@ class Connector extends \Aurora\Modules\OAuthIntegratorWebclient\Classes\Connect
 		$oClient->redirect_uri = $sRedirectUrl;
 		$oClient->client_id = $sId;
 		$oClient->client_secret = $sSecret;
-		$oClient->scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive';
+		$oClient->scope = $sScopes;
 		return $oClient;
 	}
 
-	public function Init($Id, $sSecret, $sScope = '')
+	public function Init($Id, $sSecret, $aScopes = [])
 	{
 		$mResult = false;
 
-		$oClient = $this->CreateClient($Id, $sSecret, $sScope);
+		$oClient = $this->CreateClient($Id, $sSecret, $aScopes[1]);
 		if($oClient)
 		{
 			$oUser = null;
@@ -47,7 +47,12 @@ class Connector extends \Aurora\Modules\OAuthIntegratorWebclient\Classes\Connect
 			{
 				if(($bSuccess = $oClient->Process()))
 				{
-					if(strlen($oClient->access_token))
+					if(strlen($oClient->authorization_error))
+					{
+						$oClient->error = $oClient->authorization_error;
+						$bSuccess = false;
+					}
+					elseif(strlen($oClient->access_token))
 					{
 						$bSuccess = $oClient->CallAPI(
 							'https://www.googleapis.com/oauth2/v1/userinfo',
@@ -58,11 +63,6 @@ class Connector extends \Aurora\Modules\OAuthIntegratorWebclient\Classes\Connect
 							),
 							$oUser
 						);
-					}
-					else
-					{
-						$oClient->error = $oClient->authorization_error;
-						$bSuccess = false;
 					}
 				}
 				$bSuccess = $oClient->Finalize($bSuccess);
@@ -88,17 +88,40 @@ class Connector extends \Aurora\Modules\OAuthIntegratorWebclient\Classes\Connect
 						'expires_in' => $iExpiresIn
 					)),
 					'refresh_token' => $oClient->refresh_token,
-					'scopes' => \explode('|', $sScope)
+					'scopes' => \explode('|', $aScopes[0])
 				);
 			}
 			else
 			{
-				$mResult = false;
+				$mResult = [
+					'type' => $this->Name,
+					'error' => $oClient->error
+				];
 
 				$oClient->ResetAccessToken();
 			}
 		}
-		
+
 		return $mResult;
+	}
+
+	public function RevokeAccessToken($Id, $sSecret)
+	{
+		$oClient = $this->CreateClient($Id, $sSecret, "");
+		if($oClient)
+		{
+			$oUser = null;
+			if(($bSuccess = $oClient->Initialize()))
+			{
+				if($bSuccess = $oClient->CheckAccessToken($sRedirectUrl))
+				{
+					if(!IsSet($sRedirectUrl))
+					{
+						$bSuccess = $oClient->RevokeToken();
+					}
+				}
+				$bSuccess = $oClient->Finalize($bSuccess);
+			}
+		}
 	}
 }
