@@ -19,16 +19,17 @@ class Connector extends \Aurora\Modules\OAuthIntegratorWebclient\Classes\Connect
 {
 	public $Name = 'google';
 
+	/**
+	 *
+	 */
 	public function CreateClient($sId, $sSecret, $sScopes)
 	{
-		$sRedirectUrl = rtrim(\MailSo\Base\Http::SingletonInstance()->GetFullUrl(), '\\/ ').'/?oauth='.$this->Name;
-
 		$oClient = new \oauth_client_class;
 		$oClient->offline = true;
 		$oClient->debug = self::$Debug;
 		$oClient->debug_http = self::$Debug;
 		$oClient->server = 'Google';
-		$oClient->redirect_uri = $sRedirectUrl;
+		$oClient->redirect_uri = $this->GetRedirectUrl();
 		$oClient->client_id = $sId;
 		$oClient->client_secret = $sSecret;
 		$oClient->scope = $sScopes;
@@ -103,25 +104,5 @@ class Connector extends \Aurora\Modules\OAuthIntegratorWebclient\Classes\Connect
 		}
 
 		return $mResult;
-	}
-
-	public function RevokeAccessToken($Id, $sSecret)
-	{
-		$oClient = $this->CreateClient($Id, $sSecret, "");
-		if($oClient)
-		{
-			$oUser = null;
-			if(($bSuccess = $oClient->Initialize()))
-			{
-				if($bSuccess = $oClient->CheckAccessToken($sRedirectUrl))
-				{
-					if(!IsSet($sRedirectUrl))
-					{
-						$bSuccess = $oClient->RevokeToken();
-					}
-				}
-				$bSuccess = $oClient->Finalize($bSuccess);
-			}
-		}
 	}
 }
