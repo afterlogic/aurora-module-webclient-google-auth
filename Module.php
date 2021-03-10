@@ -43,6 +43,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		$this->subscribeEvent('Google::GetSettings', array($this, 'onGetSettings'));
 		$this->subscribeEvent('Google::UpdateSettings::after', array($this, 'onAfterUpdateSettings'));
 		$this->subscribeEvent('RevokeAccessToken', array($this, 'onRevokeAccessToken'));
+		$this->subscribeEvent('ResetAccessToken', array($this, 'onResetAccessToken'));
 		$this->subscribeEvent('GetAccessToken', array($this, 'onGetAccessToken'));
 	}
 
@@ -65,36 +66,6 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 		}
 	}
 
-	public function ProcessToken()
-	{
-		$sOAuthScopes = isset($_COOKIE['oauth-scopes']) ? $_COOKIE['oauth-scopes'] : '';
-		$aGoogleScopes = [
-			'https://www.googleapis.com/auth/userinfo.email',
-			'https://www.googleapis.com/auth/userinfo.profile'
-		];
-		$this->broadcastEvent('PopulateScopes', $sOAuthScopes, $aGoogleScopes);
-
-		$mResult = false;
-		$oConnector = new Classes\Connector($this);
-		if ($oConnector)
-		{
-			$oGoogleModule = \Aurora\System\Api::GetModule('Google');
-			if ($oGoogleModule)
-			{
-				$sId = $oGoogleModule->getConfig('Id');
-				$sSecret = $oGoogleModule->getConfig('Secret');
-
-				$mResult = $oConnector->Init(
-					$sId,
-					$sSecret,
-					[$sOAuthScopes, \implode($aGoogleScopes, ' ')]
-				);
-			}
-		}
-
-		return $mResult;
-	}
-
 	/**
 	 * Passes data to connect to service.
 	 *
@@ -106,7 +77,30 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	{
 		if ($aArgs['Service'] === $this->sService)
 		{
-			$mResult = $this->ProcessToken();
+			$sOAuthScopes = isset($_COOKIE['oauth-scopes']) ? $_COOKIE['oauth-scopes'] : '';
+			$aGoogleScopes = [
+				'https://www.googleapis.com/auth/userinfo.email',
+				'https://www.googleapis.com/auth/userinfo.profile'
+			];
+			$this->broadcastEvent('PopulateScopes', $sOAuthScopes, $aGoogleScopes);
+
+			$mResult = false;
+			$oConnector = new Classes\Connector($this);
+			if ($oConnector)
+			{
+				$oGoogleModule = \Aurora\System\Api::GetModule('Google');
+				if ($oGoogleModule)
+				{
+					$sId = $oGoogleModule->getConfig('Id');
+					$sSecret = $oGoogleModule->getConfig('Secret');
+
+					$mResult = $oConnector->Init(
+						$sId,
+						$sSecret,
+						[$sOAuthScopes, \implode(' ', $aGoogleScopes)]
+					);
+				}
+			}
 			return true;
 		}
 	}
@@ -179,7 +173,28 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 				$oGoogleModule = \Aurora\System\Api::GetModule('Google');
 				if ($oGoogleModule)
 				{
+					$sAccessToken = isset($aArgs['AccessToken']) ? $aArgs['AccessToken'] : '';
 					$mResult = $oConnector->RevokeAccessToken(
+						$oGoogleModule->getConfig('Id'),
+						$oGoogleModule->getConfig('Secret'),
+						$sAccessToken
+					);
+				}
+			}
+		}
+	}
+
+	public function onResetAccessToken($aArgs)
+	{
+		if ($aArgs['Service'] === $this->sService)
+		{
+			$oConnector = new Classes\Connector($this);
+			if ($oConnector)
+			{
+				$oGoogleModule = \Aurora\System\Api::GetModule('Google');
+				if ($oGoogleModule)
+				{
+					$mResult = $oConnector->ResetAccessToken(
 						$oGoogleModule->getConfig('Id'),
 						$oGoogleModule->getConfig('Secret')
 					);
