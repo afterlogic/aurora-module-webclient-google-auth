@@ -75,7 +75,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 	 */
 	public function onOAuthIntegratorAction($aArgs, &$mResult)
 	{
-		if ($aArgs['Service'] === $this->sService)
+		if (isset($aArgs['Service']) && $aArgs['Service'] === $this->sService)
 		{
 			$sOAuthScopes = isset($_COOKIE['oauth-scopes']) ? $_COOKIE['oauth-scopes'] : '';
 			$aGoogleScopes = [
@@ -165,7 +165,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 
 	public function onRevokeAccessToken($aArgs)
 	{
-		if ($aArgs['Service'] === $this->sService)
+		if (isset($aArgs['Service']) && $aArgs['Service'] === $this->sService)
 		{
 			$oConnector = new Classes\Connector($this);
 			if ($oConnector)
@@ -186,7 +186,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 
 	public function onResetAccessToken($aArgs)
 	{
-		if ($aArgs['Service'] === $this->sService)
+		if (isset($aArgs['Service']) && $aArgs['Service'] === $this->sService)
 		{
 			$oConnector = new Classes\Connector($this);
 			if ($oConnector)
@@ -205,7 +205,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 
 	public function onGetAccessToken($aArgs, &$mResult)
 	{
-		if ($aArgs['Service'] === $this->sService && isset($aArgs['Account']))
+		if (isset($aArgs['Service']) && $aArgs['Service'] === $this->sService && isset($aArgs['Account']))
 		{
 			$mResult = false;
 			$oAccount = $aArgs['Account'];
