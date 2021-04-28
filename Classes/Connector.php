@@ -7,6 +7,8 @@
 
 namespace Aurora\Modules\GoogleAuthWebclient\Classes;
 
+use Exception;
+
 /**
  * @license https://www.gnu.org/licenses/agpl-3.0.html AGPL-3.0
  * @license https://afterlogic.com/products/common-licensing Afterlogic Software License
@@ -24,6 +26,12 @@ class Connector extends \Aurora\Modules\OAuthIntegratorWebclient\Classes\Connect
 	 */
 	public function CreateClient($sId, $sSecret, $sScopes)
 	{
+		if (empty($sId) || empty($sSecret))
+		{
+			throw new \Aurora\Modules\OAuthIntegratorWebclient\Exceptions\NotConfigured(
+				\Aurora\Modules\OAuthIntegratorWebclient\Enums\ErrorCodes::NotConfigured
+			);
+		}
 		$oClient = new \oauth_client_class;
 		$oClient->offline = true;
 		$oClient->debug = self::$Debug;
