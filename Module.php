@@ -25,6 +25,15 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
         'Google'
     );
 
+    /**
+     *
+     * @return Module
+     */
+    public static function Decorator()
+    {
+        return parent::Decorator();
+    }
+
     /***** private functions *****/
     protected function issetScope($sScope)
     {
@@ -112,7 +121,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
     {
         $oUser = \Aurora\System\Api::getAuthenticatedUser();
 
-        if (!empty($oUser)) {
+        if ($oUser) {
             $aScope = array(
                 'Name' => 'auth',
                 'Description' => $this->i18N('SCOPE_AUTH'),
@@ -188,6 +197,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
     {
         if (isset($aArgs['Service']) && $aArgs['Service'] === $this->sService && isset($aArgs['Account'])) {
             $mResult = false;
+            /** @var \Aurora\Modules\OAuthIntegratorWebclient\Models\OauthAccount $oAccount */
             $oAccount = $aArgs['Account'];
             $oTokenData = \json_decode($oAccount->AccessToken);
             if ($oTokenData) {
@@ -210,7 +220,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
                             $mResult = $oTokenData->access_token;
 
                             $oAccount->AccessToken = \json_encode($oTokenData);
-                            $oAccount->Save();
+                            $oAccount->save();
                         }
                     }
                 } else {
