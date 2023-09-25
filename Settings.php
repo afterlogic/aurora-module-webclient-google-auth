@@ -13,7 +13,6 @@ use Aurora\System\SettingsProperty;
  * @property bool $Disabled
  * @property string $Scopes
  */
- 
 class Settings extends \Aurora\System\Module\Settings
 {
     protected function initDefaults()
