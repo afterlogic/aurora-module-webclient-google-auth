@@ -65,6 +65,7 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
     public function init()
     {
         $this->subscribeEvent('OAuthIntegratorWebclient::GetServices::after', array($this, 'onAfterGetServices'));
+        $this->subscribeEvent('OAuthIntegratorWebclient::GetServiceTypes::after', array($this, 'onAfterGetServiceTypes'));
         $this->subscribeEvent('OAuthIntegratorAction', array($this, 'onOAuthIntegratorAction'));
         $this->subscribeEvent('Google::GetSettings', array($this, 'onGetSettings'));
         $this->subscribeEvent('Google::UpdateSettings::after', array($this, 'onAfterUpdateSettings'));
@@ -88,6 +89,26 @@ class Module extends \Aurora\System\Module\AbstractWebclientModule
 
         if ($oModule->oModuleSettings->EnableModule && $this->issetScope('auth') && !empty($sId) && !empty($sSecret)) {
             $aServices[] = $this->sService;
+        }
+    }
+
+    /* Adds service type to array passed by reference.
+    *
+    * @ignore
+    * @param array $aArgs
+    * @param array $aServices Array with services names passed by reference.
+    */
+    public function onAfterGetServiceTypes($aArgs, &$aServices)
+    {
+        $oModule = \Aurora\Modules\Google\Module::getInstance();
+
+        if ($oModule) {
+            $sId = $oModule->oModuleSettings->Id;
+            $sSecret = $oModule->oModuleSettings->Secret;
+
+            if ($oModule->oModuleSettings->EnableModule && !empty($sId) && !empty($sSecret)) {
+                $aServices[] = $this->sService;
+            }
         }
     }
 
